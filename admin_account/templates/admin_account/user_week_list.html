@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% block content %}
+{% load static %}
+
+<!-- Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<div class="max-w-4xl mx-auto bg-white border border-gray-200 shadow-sm p-8 rounded-xl mt-6 space-y-6">
+  <!-- Header with Back button -->
+  <div class="flex items-center justify-between">
+    <h1 class="text-2xl font-bold text-gray-800">
+      Weekly Payroll History for {{ selected_user.username }}
+    </h1>
+    <a href="{% url 'admin_user_detail' selected_user.id %}" 
+      class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition text-gray-700">
+      <i data-lucide="arrow-left" class="w-4 h-4"></i>
+      Back
+    </a>
+  </div>
+
+  {% if page_obj and page_obj.paginator.count > 0 %}
+  <!-- Week selector -->
+  <div>
+    <label for="week-dropdown" class="text-gray-700 font-medium">Jump to Week:</label>
+    <div class="relative mt-1">
+      <button id="week-dropdown-btn" 
+        class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 flex justify-between items-center text-gray-700 shadow-sm hover:border-gray-400 focus:ring-2 focus:ring-blue-500 transition">
+        <span id="selected-week">Select a week...</span>
+        <i data-lucide="chevron-down" class="w-4 h-4 text-gray-600 transition-transform duration-200"></i>
+      </button>
+
+      <ul id="week-dropdown-menu" 
+          class="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto hidden">
+        {% for week in all_weeks %}
+        <li class="px-3 py-2 hover:bg-blue-50 cursor-pointer"
+            data-url="{% url 'user_weekly_summary' selected_user.id week.start|date:'Y-m-d' %}">
+          {{ week.start|date:"M d, Y" }} → {{ week.end|date:"M d, Y" }}
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <!-- Payroll Weeks -->
+  <ul class="divide-y divide-gray-100">
+    {% for week in page_obj %}
+    <li class="py-4 flex justify-between items-center">
+      <div>
+        <p class="text-gray-800 font-medium">
+          Week of {{ week.start|date:"M d, Y" }} → {{ week.end|date:"M d, Y" }}
+        </p>
+        <p class="text-sm text-gray-500 flex items-center gap-1 mt-1">
+          Payroll Status:
+          {% if week.payroll %}
+            <i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i>
+            <span class="text-green-700 font-medium">Checked</span>
+          {% else %}
+            <i data-lucide="x-circle" class="w-4 h-4 text-red-600"></i>
+            <span class="text-red-700 font-medium">Unchecked</span>
+          {% endif %}
+        </p>
+      </div>
+
+      <a href="{% url 'user_weekly_summary' selected_user.id week.start|date:'Y-m-d' %}"
+        class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow-sm hover:bg-blue-700 transition flex items-center gap-2">
+        <i data-lucide="file-text" class="w-4 h-4"></i>
+        View Summary
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+
+  <!-- Pagination -->
+  <div class="mt-6 flex justify-center items-center space-x-2">
+    {% if page_obj.has_previous %}
+      <a href="?page={{ page_obj.previous_page_number }}" 
+        class="px-3 py-1 bg-gray-100 border rounded hover:bg-gray-200 transition">Previous</a>
+    {% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+      {% if num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+        {% if page_obj.number == num %}
+          <span class="px-3 py-1 bg-blue-600 text-white rounded">{{ num }}</span>
+        {% else %}
+          <a href="?page={{ num }}" 
+            class="px-3 py-1 bg-gray-100 border rounded hover:bg-gray-200 transition">{{ num }}</a>
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}" 
+        class="px-3 py-1 bg-gray-100 border rounded hover:bg-gray-200 transition">Next</a>
+    {% endif %}
+  </div>
+
+  {% else %}
+    <p class="text-gray-500 italic">No completed weeks yet.</p>
+  {% endif %}
+
+
+</div>
+
+<!-- Dropdown JS -->
+<script>
+  lucide.createIcons();
+
+  const btn = document.getElementById('week-dropdown-btn');
+  const menu = document.getElementById('week-dropdown-menu');
+  const selected = document.getElementById('selected-week');
+
+  btn.addEventListener('click', () => {
+    menu.classList.toggle('hidden');
+    btn.querySelector('i').classList.toggle('rotate-180');
+  });
+
+  menu.querySelectorAll('li').forEach(item => {
+    item.addEventListener('click', () => {
+      const url = item.dataset.url;
+      selected.textContent = item.textContent;
+      menu.classList.add('hidden');
+      btn.querySelector('i').classList.remove('rotate-180');
+      window.location.href = url;
+    });
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!btn.contains(e.target) && !menu.contains(e.target)) {
+      menu.classList.add('hidden');
+      btn.querySelector('i').classList.remove('rotate-180');
+    }
+  });
+</script>
+{% endblock %}

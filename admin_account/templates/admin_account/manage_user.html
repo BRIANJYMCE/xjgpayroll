@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mx-auto py-6">
+  <h2 class="text-2xl font-bold mb-6 text-gray-700">Manage Users</h2>
+
+  <!-- Filters -->
+  <form method="get" class="flex flex-col md:flex-row gap-4 mb-6">
+    <!-- Search -->
+    <div class="w-full md:w-1/4">
+      <label class="text-gray-700 font-medium text-sm">Search by Name</label>
+      <input
+        type="text"
+        name="name_search"
+        placeholder="Enter name..."
+        value="{{ name_search }}"
+        class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+      />
+    </div>
+
+    <!-- Account Status -->
+    <div class="w-full md:w-1/4">
+      <label class="text-gray-700 font-medium text-sm">Account Status</label>
+      <select
+        name="account_filter"
+        class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+      >
+        <option value="">All</option>
+        <option value="Active" {% if account_filter == "Active" %}selected{% endif %}>Active</option>
+        <option value="Deactivated" {% if account_filter == "Deactivated" %}selected{% endif %}>Deactivated</option>
+      </select>
+    </div>
+
+    <!-- Work Status -->
+    <div class="w-full md:w-1/4">
+      <label class="text-gray-700 font-medium text-sm">Work Status</label>
+      <select
+        name="work_filter"
+        class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+      >
+        <option value="">All</option>
+        <option value="On-going" {% if work_filter == "On-going" %}selected{% endif %}>On-going</option>
+        <option value="Standby" {% if work_filter == "Standby" %}selected{% endif %}>Standby</option>
+        <option value="Unassigned" {% if work_filter == "Unassigned" %}selected{% endif %}>Unassigned</option>
+      </select>
+    </div>
+
+    <!-- Sort -->
+    <div class="w-full md:w-1/4">
+      <label class="text-gray-700 font-medium text-sm">Sort</label>
+      <select
+        name="sort"
+        class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+      >
+        <option value="">Default</option>
+        <option value="asc" {% if sort_order == 'asc' %}selected{% endif %}>A → Z</option>
+        <option value="desc" {% if sort_order == 'desc' %}selected{% endif %}>Z → A</option>
+      </select>
+    </div>
+
+    <!-- Buttons -->
+    <div class="self-end flex gap-2">
+      <button
+        type="submit"
+        class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+      >
+        <i data-lucide="search" class="w-4 h-4"></i>
+        Apply
+      </button>
+      <a
+        href="{% url 'manage_users' %}"
+        class="flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition"
+      >
+        <i data-lucide="x-circle" class="w-4 h-4"></i>
+        Clear
+      </a>
+    </div>
+  </form>
+
+  <!-- User Table -->
+  <div class="overflow-x-auto" id="users-table">
+    <table class="min-w-full bg-white rounded-lg shadow overflow-hidden">
+      <thead class="bg-gray-100 text-gray-700">
+        <tr>
+          <th class="px-4 py-3 text-left">Username</th>
+          <th class="px-4 py-3 text-left">Work Status</th>
+          <th class="px-4 py-3 text-left">Account Status</th>
+          <th class="px-4 py-3 text-center">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200">
+        {% for item in page_obj %}
+        <tr class="hover:bg-gray-50">
+          <td class="px-4 py-3 font-medium">{{ item.user.username }}</td>
+          <td class="px-4 py-3">
+            {% if item.work_status == "On-going" %}
+              <span class="text-green-600 font-semibold">On-going</span>
+            {% elif item.work_status == "Standby" %}
+              <span class="text-yellow-600 font-semibold">Standby</span>
+            {% else %}
+              <span class="text-gray-600 font-semibold">Unassigned</span>
+            {% endif %}
+          </td>
+          <td class="px-4 py-3">
+            {% if item.account_status == "Active" %}
+              <span class="text-blue-600 font-semibold">Active</span>
+            {% else %}
+              <span class="text-red-600 font-semibold">Deactivated</span>
+            {% endif %}
+          </td>
+          <td class="px-4 py-3">
+            <div class="flex justify-center">
+              <a
+                href="{% url 'admin_user_detail' item.user.id %}"
+                class="flex items-center gap-1 px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition text-sm"
+              >
+                <i data-lucide="eye" class="w-4 h-4"></i>
+                View
+              </a>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="4" class="px-4 py-6 text-center text-gray-500 italic">
+            No users found.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="mt-4 flex justify-center items-center space-x-2">
+    {% if page_obj.has_previous %}
+    <a
+      href="?page={{ page_obj.previous_page_number }}{% if account_filter %}&account_filter={{ account_filter }}{% endif %}{% if work_filter %}&work_filter={{ work_filter }}{% endif %}{% if sort_order %}&sort={{ sort_order }}{% endif %}{% if name_search %}&name_search={{ name_search }}{% endif %}#users-table"
+      class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 transition"
+    >Previous</a>
+    {% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+      {% if num >= page_obj.number|add:"-2" and num <= page_obj.number|add:"2" %}
+        {% if page_obj.number == num %}
+        <span class="px-3 py-1 bg-blue-600 text-white rounded">{{ num }}</span>
+        {% else %}
+        <a
+          href="?page={{ num }}{% if account_filter %}&account_filter={{ account_filter }}{% endif %}{% if work_filter %}&work_filter={{ work_filter }}{% endif %}{% if sort_order %}&sort={{ sort_order }}{% endif %}{% if name_search %}&name_search={{ name_search }}{% endif %}#users-table"
+          class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 transition"
+        >{{ num }}</a>
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+    <a
+      href="?page={{ page_obj.next_page_number }}{% if account_filter %}&account_filter={{ account_filter }}{% endif %}{% if work_filter %}&work_filter={{ work_filter }}{% endif %}{% if sort_order %}&sort={{ sort_order }}{% endif %}{% if name_search %}&name_search={{ name_search }}{% endif %}#users-table"
+      class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 transition"
+    >Next</a>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Load Lucide -->
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>lucide.createIcons();</script>
+{% endblock %}

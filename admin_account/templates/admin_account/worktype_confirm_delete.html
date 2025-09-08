@@ -1,0 +1,37 @@
+{% extends 'base.html' %} {% block content %}
+<div class="max-w-2xl mx-auto p-6 bg-white shadow rounded-lg">
+  <h2 class="text-xl font-bold mb-4 text-red-600">Confirm Delete</h2>
+
+  <p class="mb-4">
+    The work type <strong>{{ worktype.name }}</strong> is currently being used
+    by the following users:
+  </p>
+
+  <ul class="list-disc pl-6 mb-4 text-gray-700">
+    {% for user in users %}
+    <li>{{ user }}</li>
+    {% endfor %}
+  </ul>
+
+  <p class="mb-6 text-red-500 font-semibold">
+    Deleting this will remove it from their active and ongoing tasks. Do you
+    want to continue?
+  </p>
+
+  <form method="post">
+    {% csrf_token %}
+    <button
+      type="submit"
+      class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+    >
+      Yes, Continue
+    </button>
+    <a
+      href="{% url 'worktype_options' %}"
+      class="ml-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+    >
+      Cancel
+    </a>
+  </form>
+</div>
+{% endblock %}

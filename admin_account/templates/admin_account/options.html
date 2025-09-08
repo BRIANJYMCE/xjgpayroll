@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-3xl mx-auto p-6 bg-white shadow rounded-lg">
+  <h2 class="text-2xl font-bold mb-6 text-gray-800">Manage Work Types</h2>
+
+  <!-- Add New WorkType -->
+  <form method="post" class="mb-6">
+    {% csrf_token %}
+    <div class="flex gap-2">
+      {{ form.name }}
+      <button
+        type="submit"
+        class="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
+      >
+        <i data-lucide="plus-circle" class="w-4 h-4"></i>
+        Add
+      </button>
+    </div>
+  </form>
+
+  <!-- List of WorkTypes -->
+  <div class="overflow-x-auto">
+    <table class="w-full bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+      <thead class="bg-gray-100 text-gray-700">
+        <tr>
+          <th class="px-4 py-3 text-left">Work Type</th>
+          <th class="px-4 py-3 text-center">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200">
+        {% for worktype in worktypes %}
+        <tr class="hover:bg-gray-50">
+          <td class="px-4 py-3 font-medium text-gray-800">{{ worktype.name }}</td>
+          <td class="px-4 py-3 flex justify-center gap-2">
+            <a
+              href="{% url 'worktype_edit' worktype.id %}"
+              class="flex items-center gap-1 px-3 py-1 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition text-sm"
+              title="Edit"
+            >
+              <i data-lucide="pencil" class="w-4 h-4"></i>
+              Edit
+            </a>
+            <a
+              href="{% url 'worktype_delete' worktype.id %}"
+              class="flex items-center gap-1 px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition text-sm"
+              title="Delete"
+            >
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+              Delete
+            </a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="2" class="px-4 py-6 text-center text-gray-500 italic">
+            No work types added yet.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Load Lucide icons -->
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>lucide.createIcons();</script>
+{% endblock %}

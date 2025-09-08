@@ -1,0 +1,28 @@
+{% extends 'base.html' %} {% block content %}
+<div class="max-w-lg mx-auto bg-white shadow p-6 rounded-lg">
+  <h2 class="text-2xl font-bold mb-4 text-gray-700">Assign Task</h2>
+  <form method="post">
+    {% csrf_token %}
+    <div class="space-y-4">
+      <!-- User Field -->
+      <div>
+        <label class="block text-sm font-semibold mb-1">Select User</label>
+        {{ form.user }}
+      </div>
+
+      <!-- Work Type Field -->
+      <div>
+        <label class="block text-sm font-semibold mb-1">Work Type</label>
+        {{ form.work_types }}
+      </div>
+    </div>
+
+    <button
+      type="submit"
+      class="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+    >
+      Assign Task
+    </button>
+  </form>
+</div>
+{% endblock %}

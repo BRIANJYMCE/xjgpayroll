@@ -1,0 +1,71 @@
+{% extends "base.html" %} {% block content %}
+<div class="flex items-center justify-center min-h-screen bg-gray-50 px-4">
+  <div
+    class="w-full max-w-2xl bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden"
+  >
+    <!-- Header -->
+    <div
+      class="px-6 py-6 bg-gradient-to-r from-blue-600 to-blue-500 text-white text-center"
+    >
+      <div class="flex items-center justify-center gap-2 mb-2">
+        <i data-lucide="user" class="w-7 h-7"></i>
+        <h1 class="text-2xl font-bold">User Profile</h1>
+      </div>
+      <p class="text-sm opacity-90">
+        Manage and review your account information
+      </p>
+    </div>
+
+    <!-- Details -->
+    <div class="divide-y divide-gray-100 px-6">
+      <div class="py-4 flex justify-between">
+        <span class="text-gray-600 font-medium">Full Name</span>
+        <span class="text-gray-900">{{ profile.full_name|default:"—" }}</span>
+      </div>
+      <div class="py-4 flex justify-between">
+        <span class="text-gray-600 font-medium">Username</span>
+        <span class="text-gray-900">{{ user.username }}</span>
+      </div>
+      <div class="py-4 flex justify-between">
+        <span class="text-gray-600 font-medium">Email</span>
+        <span class="text-gray-900">{{ user.email }}</span>
+      </div>
+      <div class="py-4 flex justify-between">
+        <span class="text-gray-600 font-medium">Gcash Name</span>
+        <span class="text-gray-900">{{ profile.gcash_name|default:"—" }}</span>
+      </div>
+      <div class="py-4 flex justify-between">
+        <span class="text-gray-600 font-medium">Gcash Number</span>
+        <span class="text-gray-900"
+          >{{ profile.gcash_number|default:"—" }}</span
+        >
+      </div>
+      <div class="py-4 flex justify-between">
+        <span class="text-gray-600 font-medium">Bank Name</span>
+        <span class="text-gray-900">{{ profile.bank_name|default:"—" }}</span>
+      </div>
+      <div class="py-4 flex justify-between">
+        <span class="text-gray-600 font-medium">Bank Number</span>
+        <span class="text-gray-900">{{ profile.bank_number|default:"—" }}</span>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex justify-end px-6 py-4 bg-gray-50">
+      <a
+        href="{% url 'edit_profile' %}"
+        class="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold shadow transition"
+      >
+        <i data-lucide="edit-3" class="w-4 h-4"></i>
+        Edit Profile
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>
+  lucide.createIcons();
+</script>
+{% endblock %}

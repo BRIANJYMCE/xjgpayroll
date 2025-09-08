@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mx-auto py-6">
+  <h2 class="text-2xl font-bold mb-6 text-gray-700">All Task Logs</h2>
+
+  <!-- Filters -->
+  <form method="get" class="flex flex-col md:flex-row gap-4 mb-6">
+    <!-- Date Filter -->
+    <div class="w-full md:w-1/4">
+      <label class="text-gray-700 font-medium text-sm">Filter by Date</label>
+      <input
+        type="date"
+        name="date_filter"
+        value="{{ request.GET.date_filter }}"
+        class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+      />
+    </div>
+
+    <!-- Work Type Filter -->
+    <div class="w-full md:w-1/4">
+      <label class="text-gray-700 font-medium text-sm">Filter by Work Type</label>
+      <select
+        name="work_type_filter"
+        class="mt-1 block w-full border border-gray-300 rounded-md p-2 max-h-40 overflow-y-auto focus:ring-1 focus:ring-blue-500 focus:outline-none"
+      >
+        <option value="">All Work Types</option>
+        {% for wt in all_work_types %}
+        <option value="{{ wt }}" {% if request.GET.work_type_filter == wt %}selected{% endif %}>
+          {{ wt }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- Status Filter -->
+    <div class="w-full md:w-1/4">
+      <label class="text-gray-700 font-medium text-sm">Status</label>
+      <select
+        name="status_filter"
+        class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+      >
+        <option value="">All</option>
+        <option value="ongoing" {% if request.GET.status_filter == "ongoing" %}selected{% endif %}>Ongoing</option>
+        <option value="done" {% if request.GET.status_filter == "done" %}selected{% endif %}>Done</option>
+      </select>
+    </div>
+
+    <!-- Buttons -->
+    <div class="self-end flex gap-2">
+      <button
+        type="submit"
+        class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+      >
+        <i data-lucide="search" class="w-4 h-4"></i>
+        Filter
+      </button>
+      <a
+        href="{% url 'task_list' %}"
+        class="flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition"
+      >
+        <i data-lucide="x-circle" class="w-4 h-4"></i>
+        Clear
+      </a>
+    </div>
+  </form>
+
+  <!-- Table -->
+  <div class="overflow-x-auto" id="task-table">
+    <table class="min-w-full bg-white rounded-lg shadow overflow-hidden">
+      <thead class="bg-gray-100 text-gray-700">
+        <tr>
+          <th class="px-4 py-3 text-left">Date</th>
+          <th class="px-4 py-3 text-left">User</th>
+          <th class="px-4 py-3 text-left">Work Type</th>
+          <th class="px-4 py-3 text-left">Time In</th>
+          <th class="px-4 py-3 text-left">Time Out</th>
+          <th class="px-4 py-3 text-left">Total Hours</th>
+          <th class="px-4 py-3 text-center">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200">
+        {% for log in page_obj %}
+        <tr class="hover:bg-gray-50">
+          <td class="px-4 py-3">{{ log.date }}</td>
+          <td class="px-4 py-3 font-medium">{{ log.user }}</td>
+          <td class="px-4 py-3">{{ log.work_types }}</td>
+          <td class="px-4 py-3">{{ log.time_in|default:"-" }}</td>
+          <td class="px-4 py-3">{{ log.time_out|default:"-" }}</td>
+          <td class="px-4 py-3">{{ log.total_hours }}</td>
+          <td class="px-4 py-3">
+            <div class="flex justify-center gap-2">
+              {% if log.status == "Ongoing" %}
+              <form method="post" action="{% url 'stop_shift' log.id %}">
+                {% csrf_token %}
+                <button
+                  type="submit"
+                  class="flex items-center justify-center px-2 py-1 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition"
+                  title="Stop Shift"
+                >
+                  <i data-lucide="pause-circle" class="w-4 h-4"></i>
+                </button>
+              </form>
+              {% endif %}
+              <form method="post" action="{% url 'delete_shift' log.id %}">
+                {% csrf_token %}
+                <button
+                  type="submit"
+                  class="flex items-center justify-center px-2 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition"
+                  title="Delete Shift"
+                >
+                  <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="7" class="px-4 py-6 text-center text-gray-500 italic">
+            No logs found.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="mt-4 flex justify-center items-center space-x-2">
+    {% if page_obj.has_previous %}
+    <a
+      href="?page={{ page_obj.previous_page_number }}{% if request.GET.date_filter %}&date_filter={{ request.GET.date_filter }}{% endif %}{% if request.GET.work_type_filter %}&work_type_filter={{ request.GET.work_type_filter }}{% endif %}{% if request.GET.status_filter %}&status_filter={{ request.GET.status_filter }}{% endif %}#task-table"
+      class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 transition"
+    >Previous</a>
+    {% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+      {% if num >= page_obj.number|add:"-2" and num <= page_obj.number|add:"2" %}
+        {% if page_obj.number == num %}
+        <span class="px-3 py-1 bg-blue-600 text-white rounded">{{ num }}</span>
+        {% else %}
+        <a
+          href="?page={{ num }}{% if request.GET.date_filter %}&date_filter={{ request.GET.date_filter }}{% endif %}{% if request.GET.work_type_filter %}&work_type_filter={{ request.GET.work_type_filter }}{% endif %}{% if request.GET.status_filter %}&status_filter={{ request.GET.status_filter }}{% endif %}#task-table"
+          class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 transition"
+        >{{ num }}</a>
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+    <a
+      href="?page={{ page_obj.next_page_number }}{% if request.GET.date_filter %}&date_filter={{ request.GET.date_filter }}{% endif %}{% if request.GET.work_type_filter %}&work_type_filter={{ request.GET.work_type_filter }}{% endif %}{% if request.GET.status_filter %}&status_filter={{ request.GET.status_filter }}{% endif %}#task-table"
+      class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 transition"
+    >Next</a>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Load Lucide -->
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>lucide.createIcons();</script>
+{% endblock %}

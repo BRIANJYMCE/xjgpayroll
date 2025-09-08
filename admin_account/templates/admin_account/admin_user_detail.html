@@ -1,0 +1,401 @@
+{% extends 'base.html' %} 
+{% block content %} 
+{% load widget_tweaks %}
+
+<div class="max-w-4xl mx-auto p-8 space-y-8">
+
+    <!-- Back button -->
+  <div>
+    <a
+      href="{% url 'manage_users' %}"
+      class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 hover:text-gray-900 transition-colors cursor-pointer"
+    >
+      ← Back to Manage Users
+    </a>
+  </div>
+
+
+  <!-- Simplified header with better typography -->
+  <div class="border-b border-gray-100 pb-6">
+    <h1 class="text-3xl font-light text-gray-900 tracking-tight">
+      User Details
+    </h1>
+  </div>
+
+  <!-- User info card -->
+  <div class="bg-white border border-gray-100 rounded-xl p-6">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <!-- User Information -->
+      <div class="space-y-4">
+        <div class="space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="text-sm font-medium text-gray-500 w-28">Username</span>
+            <span class="text-gray-900 font-medium">
+              {{ selected_user.username }}
+            </span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-sm font-medium text-gray-500 w-28">Email</span>
+            <span class="text-gray-700">{{ selected_user.email }}</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-sm font-medium text-gray-500 w-28"
+              >Full Name</span
+            >
+            <span class="text-gray-700"
+              >{{ profile.full_name|default:"—" }}</span
+            >
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-sm font-medium text-gray-500 w-28">Status</span>
+            {% if selected_user.is_active %}
+            <span
+              class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200"
+            >
+              Active
+            </span>
+            {% else %}
+            <span
+              class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200"
+            >
+              Deactivated
+            </span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Account actions -->
+      <div class="flex flex-col gap-3">
+        <form method="post" class="space-y-3">
+          {% csrf_token %} 
+          {% if selected_user.is_active %}
+          <button
+            type="button"
+            class="w-full px-4 py-2.5 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors cursor-pointer"
+            onclick="openDeactivateModal()"
+          >
+            Deactivate Account
+          </button>
+          {% else %}
+          <button
+            type="submit"
+            name="reactivate_account"
+            class="w-full px-4 py-2.5 text-sm font-medium text-green-700 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors cursor-pointer"
+          >
+            Reactivate Account
+          </button>
+          {% endif %}
+
+          <button
+            type="button"
+            class="w-full px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+            onclick="openDeleteModal()"
+          >
+            Delete Account
+          </button>
+
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Details -->
+  <div class="bg-white border border-gray-100 rounded-xl p-6">
+    <h2 class="text-xl font-light text-gray-900 mb-6">Payment Details</h2>
+    <div class="space-y-3">
+      <div class="flex items-center gap-3">
+        <span class="text-sm font-medium text-gray-500 w-28">GCash Name</span>
+        <span class="text-gray-700">{{ profile.gcash_name|default:"—" }}</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-sm font-medium text-gray-500 w-28">GCash Number</span>
+        <span class="text-gray-700"
+          >{{ profile.gcash_number|default:"—" }}</span
+        >
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-sm font-medium text-gray-500 w-28">Bank Name</span>
+        <span class="text-gray-700">{{ profile.bank_name|default:"—" }}</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-sm font-medium text-gray-500 w-28">Bank Number</span>
+        <span class="text-gray-700">{{ profile.bank_number|default:"—" }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Work types -->
+  <div id="assigned_worktypes" class="bg-white border border-gray-100 rounded-xl p-6">
+    <h2 class="text-xl font-light text-gray-900 mb-6">Assigned Work Types</h2>
+    {% if assigned_worktypes %}
+    <div class="space-y-3">
+      {% for wt in assigned_worktypes %}
+      <div
+        class="flex items-center justify-between py-3 px-4 bg-gray-50 rounded-lg"
+      >
+        <span class="text-gray-900 font-medium">{{ wt.name }}</span>
+        {% if wt.has_active_log %}
+        <button
+          type="button"
+          class="text-sm text-red-600 hover:text-red-700 font-medium transition-colors cursor-pointer"
+          onclick="openModal('{{ wt.name }}')"
+        >
+          Remove
+        </button>
+        {% else %}
+        <form method="post" action="{% url 'admin_user_detail' selected_user.id %}#assigned_worktypes" class="inline">
+          {% csrf_token %}
+          <input type="hidden" name="remove_worktype" value="{{ wt.id }}" />
+          <button
+            type="submit"
+            class="text-sm text-red-600 hover:text-red-700 font-medium transition-colors cursor-pointer"
+          >
+            Remove
+          </button>
+        </form>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-8">
+      <p class="text-gray-500">No work types assigned</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Assign work type -->
+  <div id="assign-worktype"  class="bg-white border border-gray-100 rounded-xl p-6">
+    <h2 class="text-xl font-light text-gray-900 mb-6">Assign Work Type</h2>
+    <form method="post" action="{% url 'admin_user_detail' selected_user.id %}#assigned_worktypes" class="flex gap-3">
+      {% csrf_token %}
+      <div class="flex-1">
+        <select
+          name="{{ form.work_type.name }}"
+          id="{{ form.work_type.id_for_label }}"
+          class="w-full px-4 py-2.5 text-gray-900 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent hover:border-gray-300 transition-all duration-200 appearance-none cursor-pointer"
+          style="
+            background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 4 5&quot;><path fill=&quot;%23666&quot; d=&quot;M2 0L0 2h4zm0 5L0 3h4z&quot;/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 12px;
+          "
+        >
+          <option value="">Select work type...</option>
+          {% for choice in form.work_type.field.queryset %}
+          <option value="{{ choice.pk }}">{{ choice }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <button
+        type="submit"
+        name="assign_worktype"
+        class="px-6 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
+      >
+        Assign
+      </button>
+    </form>
+  </div>
+
+<!-- Task logs -->
+<div id="task-logs" class="bg-white border border-gray-100 rounded-xl overflow-hidden">
+  <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+    <h2 class="text-xl font-light text-gray-900">Task Logs</h2>
+    <a href="{% url 'user_week_list' selected_user.id %}" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors">
+      View Weekly Payroll
+    </a>
+  </div>
+
+  <!-- Filters -->
+<div class="px-6 py-4 border-b border-gray-100 flex flex-wrap gap-3 items-center">
+  <form method="get" class="flex flex-wrap gap-3 items-center w-full">
+    <div>
+      <label class="text-sm font-medium text-gray-500">Date:</label>
+      <input type="date" name="date_filter" value="{{ request.GET.date_filter }}" class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+    </div>
+    <div>
+      <label class="text-sm font-medium text-gray-500">Work Type:</label>
+      <select name="work_type_filter" class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+        <option value="">All</option>
+        {% for wt in all_work_types %}
+          <option value="{{ wt }}" {% if request.GET.work_type_filter == wt %}selected{% endif %}>{{ wt }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="flex gap-2 items-center mt-2">
+      <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">Filter</button>
+      <a href="{% url 'admin_user_detail' selected_user.id %}#task-logs" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 text-sm">Clear</a>
+    </div>
+  </form>
+</div>
+
+
+
+  <div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-100">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+          <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Work Type</th>
+          <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time In</th>
+          <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time Out</th>
+          <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Hours</th>
+          <th class="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody class="bg-white divide-y divide-gray-100">
+        {% for log in page_obj %}
+        <tr class="hover:bg-gray-50 transition-colors">
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ log.date }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ log.work_types }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ log.time_in|default:"—" }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ log.time_out|default:"—" }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ log.total_hours }}</td>
+          <td class="px-6 py-4 text-center">
+              <div class="inline-flex gap-2">
+                {% if log.total_hours == "Ongoing" %}
+                <form method="post" action="{% url 'stop_shift' log.id %}#task-logs">
+                  {% csrf_token %}
+                  <button type="submit" class="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 text-sm" title="Stop Shift">
+                    <i data-lucide="square" class="w-4 h-4"></i>
+                  </button>
+                </form>
+                {% endif %}
+                <form method="post" action="{% url 'delete_shift' log.id %}#task-logs">
+                  {% csrf_token %}
+                  <button type="submit" class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm" title="Delete Shift">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                  </button>
+                </form>
+              </div>
+          </td>
+
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6" class="px-6 py-12 text-center text-gray-500">No logs found</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+  <!-- Pagination -->
+  <div class="mt-4 flex justify-center items-center space-x-2">
+    {% with date=request.GET.date_filter worktype=request.GET.work_type_filter %}
+      {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}&date_filter={{ date }}&work_type_filter={{ worktype }}#task-logs" class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 transition">Previous</a>
+      {% endif %}
+
+      {% for num in page_obj.paginator.page_range %}
+        {% if num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+          {% if page_obj.number == num %}
+            <span class="px-3 py-1 bg-blue-600 text-white rounded">{{ num }}</span>
+          {% else %}
+            <a href="?page={{ num }}&date_filter={{ date }}&work_type_filter={{ worktype }}#task-logs" class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 transition">{{ num }}</a>
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}&date_filter={{ date }}&work_type_filter={{ worktype }}#task-logs" class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 transition">Next</a>
+      {% endif %}
+    {% endwith %}
+  </div>
+
+
+  </div>
+</div>
+
+<!-- Modal -->
+<div
+  id="confirmModal"
+  class="hidden fade-in fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50"
+>
+  <div class="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-6">
+    <h2 class="text-lg font-medium text-gray-900 mb-3">
+      Cannot Remove Work Type
+    </h2>
+    <p id="modalMessage" class="text-gray-600 mb-6 leading-relaxed"></p>
+    <div class="flex justify-end">
+      <button
+        type="button"
+        class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
+        onclick="closeModal()"
+      >
+        OK
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Deactivate Modal -->
+<div id="deactivateModal" class="hidden fade-in fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
+  <div class="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-6">
+    <h2 class="text-lg font-medium text-gray-900 mb-3">Deactivate Account</h2>
+    <p class="text-gray-600 mb-6 leading-relaxed">
+      Are you sure you want to deactivate this account? All ongoing tasks will be ended.
+    </p>
+    <div class="flex justify-end gap-3">
+      <button type="button" class="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 cursor-pointer" onclick="closeDeactivateModal()">Cancel</button>
+      <form method="post">
+        {% csrf_token %}
+        <button type="submit" name="deactivate_account" class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 cursor-pointer">Deactivate</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Modal -->
+<div id="deleteModal" class="hidden fade-in fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
+  <div class="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-6">
+    <h2 class="text-lg font-medium text-gray-900 mb-3">Delete Account</h2>
+    <p class="text-gray-600 mb-6 leading-relaxed">
+      Are you sure you want to <span class="font-semibold text-red-600">DELETE</span> this account? This action cannot be undone.
+    </p>
+    <div class="flex justify-end gap-3">
+      <button type="button" class="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 cursor-pointer" onclick="closeDeleteModal()">Cancel</button>
+      <form method="post">
+        {% csrf_token %}
+        <button type="submit" name="delete_account" class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 cursor-pointer">Delete</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  // Deactivate modal
+  function openDeactivateModal() {
+    document.getElementById("deactivateModal").classList.remove("hidden");
+  }
+  function closeDeactivateModal() {
+    document.getElementById("deactivateModal").classList.add("hidden");
+  }
+
+  // Delete modal
+  function openDeleteModal() {
+    document.getElementById("deleteModal").classList.remove("hidden");
+  }
+  function closeDeleteModal() {
+    document.getElementById("deleteModal").classList.add("hidden");
+  }
+</script>
+
+
+<script>
+  function openModal(name) {
+    document.getElementById("modalMessage").innerText =
+      "Cannot remove '" + name + "' because the user has an active log in it.";
+    document.getElementById("confirmModal").classList.remove("hidden");
+  }
+  function closeModal() {
+    document.getElementById("confirmModal").classList.add("hidden");
+  }
+</script>
+
+{% endblock %}

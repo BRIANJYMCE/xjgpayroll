@@ -1,0 +1,315 @@
+{% extends 'base.html' %} {% load static %} {% block content %}
+<div class="flex items-center justify-center min-h-screen bg-gray-50 py-10">
+  <div class="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow">
+    <!-- Logo -->
+    <div class="flex flex-col items-center mb-3">
+      <img
+        src="{% static 'theme/xjg_logo.png' %}"
+        alt="XJG Logo"
+        class="h-20 w-auto mb-1"
+      />
+    </div>
+
+    <!-- Title -->
+    <h2 class="text-2xl font-extrabold text-center text-gray-900 mb-4">
+      Create your account
+    </h2>
+
+    <!-- Form -->
+    <form method="post" class="space-y-6">
+      {% csrf_token %}
+      <!-- Full Name -->
+      <div>
+        <label
+          for="id_full_name"
+          class="block text-sm font-medium text-gray-700 mb-1"
+        >
+          Full Name
+        </label>
+        <input
+          type="text"
+          name="full_name"
+          id="id_full_name"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+          placeholder="Enter your full name"
+          required
+        />
+        {% if form.full_name.errors %}
+        <p class="text-xs text-red-500 mt-1">
+          {{ form.full_name.errors|striptags }}
+        </p>
+        {% endif %}
+      </div>
+
+      <!-- Username -->
+      <div>
+        <label
+          for="id_username"
+          class="block text-sm font-medium text-gray-700 mb-1"
+        >
+          Username
+        </label>
+        <input
+          type="text"
+          name="username"
+          id="id_username"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+          placeholder="Choose a username"
+          required
+        />
+        {% if form.username.errors %}
+        <p class="text-xs text-red-500 mt-1">
+          {{ form.username.errors|striptags }}
+        </p>
+        {% endif %}
+      </div>
+
+      <!-- Email -->
+      <div>
+        <label
+          for="id_email"
+          class="block text-sm font-medium text-gray-700 mb-1"
+        >
+          Email
+        </label>
+        <input
+          type="email"
+          name="email"
+          id="id_email"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+          placeholder="Please enter a valid email address"
+          required
+        />
+        {% if form.email.errors %}
+        <p class="text-xs text-red-500 mt-1">
+          {{ form.email.errors|striptags }}
+        </p>
+        {% endif %}
+      </div>
+
+      <!-- Password -->
+      <div>
+        <label
+          for="id_password1"
+          class="block text-sm font-medium text-gray-700 mb-1"
+        >
+          Password
+        </label>
+        <div class="relative">
+          <input
+            type="password"
+            name="password1"
+            id="id_password1"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+            placeholder="Create a password"
+            required
+          />
+          <button
+            type="button"
+            onclick="togglePassword('id_password1', this)"
+            class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+              />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+              />
+            </svg>
+          </button>
+        </div>
+        {% if form.password1.errors %}
+        <p class="text-xs text-red-500 mt-1">
+          {{ form.password1.errors|striptags }}
+        </p>
+        {% endif %}
+      </div>
+
+      <!-- Confirm Password -->
+      <div>
+        <label
+          for="id_password2"
+          class="block text-sm font-medium text-gray-700 mb-1"
+        >
+          Confirm Password
+        </label>
+        <div class="relative">
+          <input
+            type="password"
+            name="password2"
+            id="id_password2"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+            placeholder="Re-enter your password"
+            required
+          />
+          <button
+            type="button"
+            onclick="togglePassword('id_password2', this)"
+            class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+              />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+              />
+            </svg>
+          </button>
+        </div>
+        {% if form.password2.errors %}
+        <p class="text-xs text-red-500 mt-1">
+          {{ form.password2.errors|striptags }}
+        </p>
+        {% endif %}
+      </div>
+
+      <!-- GCash Number -->
+      <div>
+        <label
+          for="id_gcash_number"
+          class="block text-sm font-medium text-gray-700 mb-1"
+        >
+          GCash Number
+        </label>
+        <input
+          type="text"
+          name="gcash_number"
+          id="id_gcash_number"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+          placeholder="09xxxxxxxxx"
+          required
+        />
+        {% if form.gcash_number.errors %}
+        <p class="text-xs text-red-500 mt-1">
+          {{ form.gcash_number.errors|striptags }}
+        </p>
+        {% endif %}
+      </div>
+
+      <!-- GCash Name -->
+      <div>
+        <label
+          for="id_gcash_name"
+          class="block text-sm font-medium text-gray-700 mb-1"
+        >
+          GCash Name
+        </label>
+        <input
+          type="text"
+          name="gcash_name"
+          id="id_gcash_name"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+          placeholder="John B."
+          required
+        />
+        {% if form.gcash_name.errors %}
+        <p class="text-xs text-red-500 mt-1">
+          {{ form.gcash_name.errors|striptags }}
+        </p>
+        {% endif %}
+      </div>
+
+      <!-- Bank Name -->
+      <div>
+        <label
+          for="id_bank_name"
+          class="block text-sm font-medium text-gray-700 mb-1"
+        >
+          Bank Name
+        </label>
+        <input
+          type="text"
+          name="bank_name"
+          id="id_bank_name"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+          placeholder="e.g., BDO, BPI"
+          required
+        />
+        {% if form.bank_name.errors %}
+        <p class="text-xs text-red-500 mt-1">
+          {{ form.bank_name.errors|striptags }}
+        </p>
+        {% endif %}
+      </div>
+
+      <!-- Bank Number -->
+      <div>
+        <label
+          for="id_bank_number"
+          class="block text-sm font-medium text-gray-700 mb-1"
+        >
+          Bank Number
+        </label>
+        <input
+          type="text"
+          name="bank_number"
+          id="id_bank_number"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+          placeholder="e.g., 1234-5678-9012"
+          required
+        />
+        {% if form.bank_number.errors %}
+        <p class="text-xs text-red-500 mt-1">
+          {{ form.bank_number.errors|striptags }}
+        </p>
+        {% endif %}
+      </div>
+
+      <!-- Submit -->
+      <button
+        type="submit"
+        class="w-full py-2 px-4 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+      >
+        Register
+      </button>
+    </form>
+
+    <!-- Already Registered -->
+    <div class="text-center mt-4">
+      <span class="text-gray-600">Already have an account?</span>
+      <a href="{% url 'login' %}" class="text-blue-600 hover:underline">
+        Login here
+      </a>
+    </div>
+  </div>
+
+  <script>
+    function togglePassword(id, btn) {
+      const input = document.getElementById(id);
+      if (input.type === "password") {
+        input.type = "text";
+        btn.querySelector("svg").classList.add("text-green-600");
+      } else {
+        input.type = "password";
+        btn.querySelector("svg").classList.remove("text-green-600");
+      }
+    }
+  </script>
+</div>
+{% endblock %}

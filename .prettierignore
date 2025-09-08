@@ -1,0 +1,18 @@
+# Ignore user_account timelog template
+user_account/templates/user_account/timelog_form.html
+
+user_account/templates/user_account/timelog_list.html
+
+user_account/templates/user_account/login.html
+
+admin_account/templates/admin_account/user_weekly_summary.html
+
+admin_account/templates/admin_account/task_list.html
+
+admin_account/templates/admin_account/manage_user.html
+
+admin_account/templates/admin_account/admin_user_detail.html
+
+admin_account/templates/admin_account/user_week_list.html
+
+admin_account/templates/admin_account/options.html

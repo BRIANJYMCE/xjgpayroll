@@ -1,0 +1,34 @@
+{% extends 'base.html' %} {% block content %}
+<div class="max-w-lg mx-auto p-6 bg-white shadow rounded-lg">
+  <h2 class="text-2xl font-bold mb-6 text-gray-800">Edit Work Type</h2>
+
+  <form method="post" class="space-y-4">
+    {% csrf_token %}
+    <div>{{ form.name }}</div>
+
+    <div class="flex gap-3">
+      <button
+        type="submit"
+        class="flex items-center gap-2 bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-700 transition"
+      >
+        <i data-lucide="save" class="w-4 h-4"></i>
+        Save Changes
+      </button>
+
+      <a
+        href="{% url 'worktype_options' %}"
+        class="flex items-center gap-2 bg-gray-300 text-gray-800 px-5 py-2 rounded-md hover:bg-gray-400 transition"
+      >
+        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+        Return
+      </a>
+    </div>
+  </form>
+</div>
+
+<!-- Load Lucide icons -->
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>
+  lucide.createIcons();
+</script>
+{% endblock %}

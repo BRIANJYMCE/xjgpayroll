@@ -1,0 +1,109 @@
+{% extends 'base.html' %} {% block content %}
+<div class="container mx-auto py-10 px-6">
+  <!-- Page Title -->
+  <h1 class="text-3xl font-bold mb-10 text-gray-900 text-center">
+    Admin Main Menu
+  </h1>
+
+  <!-- Menu Grid -->
+  <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+    <!-- Assign Task -->
+    <a
+      href="{% url 'manage_users' %}"
+      class="group p-6 bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md hover:border-blue-500 transition"
+    >
+      <div class="flex items-center space-x-4">
+        <div class="p-3 bg-blue-100 rounded-full text-blue-600">
+          <!-- Clipboard Icon -->
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12h6m-6 4h6m-2 8H9a2 2 0 01-2-2V6a2 2 0 012-2h1V2h4v2h1a2 2 0 012 2v16a2 2 0 01-2 2z"
+            />
+          </svg>
+        </div>
+        <h2
+          class="text-lg font-semibold text-gray-900 group-hover:text-blue-600"
+        >
+          Manage Users
+        </h2>
+      </div>
+      <p class="text-gray-600 mt-3">Manage user acounts and infromation</p>
+    </a>
+
+    <!-- View Assigned Tasks -->
+    <a
+      href="{% url 'task_list' %}"
+      class="group p-6 bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md hover:border-green-500 transition"
+    >
+      <div class="flex items-center space-x-4">
+        <div class="p-3 bg-green-100 rounded-full text-green-600">
+          <!-- List Icon -->
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 17h6m-6-4h6m-6-4h6M4 6h16M4 12h16M4 18h16"
+            />
+          </svg>
+        </div>
+        <h2
+          class="text-lg font-semibold text-gray-900 group-hover:text-green-600"
+        >
+          View Assigned Tasks
+        </h2>
+      </div>
+      <p class="text-gray-600 mt-3">
+        See all tasks you have created for users.
+      </p>
+    </a>
+
+    <!-- Work Type Options -->
+    <a
+      href="{% url 'worktype_options' %}"
+      class="group p-6 bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md hover:border-purple-500 transition"
+    >
+      <div class="flex items-center space-x-4">
+        <div class="p-3 bg-purple-100 rounded-full text-purple-600">
+          <!-- Settings Icon -->
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 6V4m0 16v-2m8-6h2M4 12H2m16.95-6.95l1.414-1.414M5.636 18.364L4.222 19.778m12.728 0l1.414-1.414M5.636 5.636L4.222 4.222"
+            />
+          </svg>
+        </div>
+        <h2
+          class="text-lg font-semibold text-gray-900 group-hover:text-purple-600"
+        >
+          Work Type Options
+        </h2>
+      </div>
+      <p class="text-gray-600 mt-3">Create and manage your work types.</p>
+    </a>
+  </div>
+</div>
+{% endblock %}
