@@ -151,7 +151,7 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
 
 TAILWIND_APP_NAME = 'theme'
 NPM_BIN_PATH = "C:/Program Files/nodejs/npm.cmd"
@@ -159,3 +159,16 @@ NPM_BIN_PATH = "C:/Program Files/nodejs/npm.cmd"
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
+
+# for local development only
+# EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+
+# productions
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'jymcebrianbertillo025@gmail.com'
+EMAIL_HOST_PASSWORD = 'vmsw epwe efro nhuf'
+'
