@@ -24,9 +24,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-^sfo(*g44d9_k(z984#4=@5l0ws#d#4@oa%&^(8+5@3stxlprv'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
-ALLOWED_HOSTS = []
+# Localhost
+# DEBUG = True
+# ALLOWED_HOSTS = []
+
+
+# production
+DEBUG = False
+ALLOWED_HOSTS = ["xjgpayroll.pythonanywhere.com"]
 
 
 # Application definition
